@@ -26,11 +26,7 @@ Please keep the above information when you use this code in your project.
 #include <Wire.h>
 
 
-#ifdef __AVR__
- #define WIRE Wire
-#else // Arduino Due
- #define WIRE Wire1
-#endif
+#define WIRE Wire
 
 
 SC16IS750::SC16IS750(uint8_t prtcl, uint8_t addr_sspin)
@@ -88,6 +84,7 @@ int SC16IS750::read(void)
 size_t SC16IS750::write(uint8_t val)
 {
     WriteByte(val);
+    return sizeof(uint8_t);
 }
 
 void SC16IS750::pinMode(uint8_t pin, uint8_t i_o)
@@ -108,7 +105,7 @@ uint8_t SC16IS750::digitalRead(uint8_t pin)
 
 uint8_t SC16IS750::ReadRegister(uint8_t reg_addr)
 {
-    uint8_t result;
+    uint8_t result = 0;
 	if ( protocol == SC16IS750_PROTOCOL_I2C ) {  // register read operation via I2C
 
 		WIRE.beginTransmission(device_address_sspin);
@@ -280,7 +277,7 @@ uint8_t SC16IS750::GPIOGetPinState(uint8_t pin_number)
     uint8_t temp_iostate;
 
     temp_iostate = ReadRegister(SC16IS750_REG_IOSTATE);
-    if ( temp_iostate & (0x01 << pin_number)== 0 ) {
+    if ((temp_iostate & (0x01 << pin_number)) == 0 ) {
       return 0;
     }
     return 1;
